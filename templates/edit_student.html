@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Student{% endblock %}
+
+{% block content %}
+
+<div class="dashboard-container">
+
+    <div class="panel-header">
+        <h2>Edit Student</h2>
+    </div>
+
+    <div class="main-panel">
+
+        <form method="POST">
+
+            <label>Name</label><br><br>
+
+            <input type="text" name="name" value="{{ student.name }}" required style="width:100%;padding:10px;"><br><br>
+
+
+            <label>GPA</label><br><br>
+
+            <input type="number" step="0.01" name="gpa" value="{{ student.gpa }}" required
+                style="width:100%;padding:10px;"><br><br>
+
+
+            <label>Attendance</label><br><br>
+
+            <input type="number" step="0.01" name="attendance" value="{{ student.attendance }}" required
+                style="width:100%;padding:10px;"><br><br>
+
+
+            <label>Assignments Completed</label><br><br>
+
+            <input type="number" name="assignments_completed" value="{{ student.assignments_completed }}" required
+                style="width:100%;padding:10px;"><br><br>
+
+
+            <button type="submit" class="btn-outline">
+
+                Update Student
+
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block title %}Prediction Reports{% endblock %}
+{% block nav_reports %}active{% endblock %}
+{% block page_title %}Reports{% endblock %}
+{% block page_subtitle %}Prediction History{% endblock %}
+
+{% block content %}
+<div class="data-container">
+    <div class="main-panel" style="width: 100%;">
+        <div class="panel-header">
+            <h2>Prediction History</h2>
+            {% if current_user.role == 'Admin' %}
+            <a href="{{ url_for('predict') }}"><button class="btn-primary">Generate New Prediction</button></a>
+            {% endif %}
+        </div>
+        <div style="overflow-x: auto; margin-top: 20px;">
+            <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                <thead>
+                    <tr style="border-bottom: 2px solid #eee; color: #666;">
+                        <th style="padding: 12px;">Report ID</th>
+                        <th style="padding: 12px;">Student Name</th>
+                        <th style="padding: 12px;">Status</th>
+                        <th style="padding: 12px;">Confidence Score</th>
+                        <th style="padding: 12px;">Generated At</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for report in reports %}
+                    <tr style="border-bottom: 1px solid #eee;">
+                        <td style="padding: 12px;">#{{ report.id }}</td>
+                        <td style="padding: 12px; font-weight: 500;">{{ report.student.name }}</td>
+                        <td style="padding: 12px;">{{ report.status }}</td>
+                        <td style="padding: 12px;">
+                            {% if report.confidence_score %}
+                                {{ report.confidence_score|round(2) }}%
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
+                        <td style="padding: 12px;">{{ report.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" style="padding: 20px; text-align: center; color: #888;">No reports generated yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

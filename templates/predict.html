@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}Predict Dropout Risk{% endblock %}
+{% block nav_reports %}active{% endblock %}
+{% block page_title %}Predict Risk{% endblock %}
+{% block page_subtitle %}Run AI Model on Student Data{% endblock %}
+
+{% block content %}
+<div class="data-container">
+    <div class="main-panel" style="width: 100%; max-width: 600px; margin: 0 auto;">
+        <div class="panel-header">
+            <h2>Select Student for Prediction</h2>
+        </div>
+        <div style="margin-top: 20px;">
+            <form action="{{ url_for('predict') }}" method="POST">
+                <div style="margin-bottom:20px;">
+                    <label><b>Student</b></label><br><br>
+                    <select name="student_id" required style="width:100%;padding:12px;border-radius:8px;border:1px solid #ccc;">
+                        <option value="" disabled selected>-- Select a Student --</option>
+                        {% for student in students %}
+                            <option value="{{ student.id }}">{{ student.name }} (ID: {{ student.id }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" class="btn-primary" style="width: 100%; padding: 12px;">Run Prediction Model</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

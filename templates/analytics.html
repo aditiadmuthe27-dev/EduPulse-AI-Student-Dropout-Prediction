@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}Analytics Dashboard{% endblock %}
+{% block nav_analytics %}active{% endblock %}
+{% block page_title %}Analytics Dashboard{% endblock %}
+{% block page_subtitle %}Visualizing Dropout Risks{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="data-container">
+    <div class="content-grid">
+        <div class="main-panel" style="grid-column: span 2;">
+            <div class="panel-header">
+                <h2>Dropout Risk Distribution</h2>
+                <a href="{{ url_for('upload_csv') }}"><button class="btn-primary">Train Model with CSV</button></a>
+            </div>
+            <div style="width: 100%; max-width: 500px; margin: 20px auto;">
+                <canvas id="riskChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var ctx = document.getElementById('riskChart').getContext('2d');
+    var chartData = {{ chart_data|tojson }};
+    
+    var myChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Low Risk', 'Medium Risk', 'High Risk'],
+            datasets: [{
+                data: chartData,
+                backgroundColor: [
+                    '#4caf50', // green
+                    '#ff9800', // orange
+                    '#f44336'  // red
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

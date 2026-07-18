@@ -1,0 +1,9 @@
+Flask
+Flask-SQLAlchemy
+Flask-Login
+Flask-Bcrypt
+scikit-learn
+pandas
+numpy
+joblib
+werkzeug

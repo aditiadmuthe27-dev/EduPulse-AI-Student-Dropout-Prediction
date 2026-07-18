@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block title %}Student Dashboard{% endblock %}
+{% block nav_dashboard %}active{% endblock %}
+{% block page_title %}Welcome, {{ current_user.username }}{% endblock %}
+{% block page_subtitle %}Your Personal Dashboard{% endblock %}
+
+{% block content %}
+<div class="data-container">
+    {% if not student %}
+    <div class="main-panel" style="width: 100%;">
+        <div class="placeholder-box" style="padding: 40px; text-align: center;">
+            <i class="ph ph-warning-circle" style="font-size: 48px; color: #ff9800; margin-bottom: 10px;"></i>
+            <h3>No Student Profile Linked</h3>
+            <p>Your user account is not currently linked to a student record. Please contact the administrator.</p>
+        </div>
+    </div>
+    {% else %}
+    <div class="cards-grid">
+        <div class="summary-card card-blue">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="ph ph-graduation-cap"></i>
+                    <span>Your GPA</span>
+                </div>
+            </div>
+            <div class="card-value">
+                <span class="number">{{ student.gpa }}</span>
+            </div>
+        </div>
+        <div class="summary-card card-yellow">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="ph ph-calendar-check"></i>
+                    <span>Attendance</span>
+                </div>
+            </div>
+            <div class="card-value">
+                <span class="number">{{ student.attendance }}%</span>
+            </div>
+        </div>
+        <div class="summary-card {% if student.risk_label == 'High' %}card-pink{% else %}card-blue{% endif %}">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="ph ph-shield-check"></i>
+                    <span>Current Risk Level</span>
+                </div>
+            </div>
+            <div class="card-value">
+                <span class="number {% if student.risk_label == 'High' %}text-danger{% endif %}">{{ student.risk_label|default('Unknown') }}</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-grid" style="margin-top: 20px;">
+        <div class="main-panel">
+            <div class="panel-header">
+                <h2>Your Prediction Reports</h2>
+            </div>
+            <div style="overflow-x: auto; margin-top: 10px;">
+                <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                    <thead>
+                        <tr style="border-bottom: 2px solid #eee; color: #666;">
+                            <th style="padding: 12px;">Date</th>
+                            <th style="padding: 12px;">Confidence Score</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for report in reports %}
+                        <tr style="border-bottom: 1px solid #eee;">
+                            <td style="padding: 12px;">{{ report.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                            <td style="padding: 12px;">{{ report.confidence_score|round(2) }}%</td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="2" style="padding: 20px; text-align: center; color: #888;">No reports available.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

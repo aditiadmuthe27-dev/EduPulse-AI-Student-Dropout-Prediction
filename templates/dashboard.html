@@ -1,0 +1,268 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+{% block nav_dashboard %}active{% endblock %}
+
+{% block page_title %}Dashboard{% endblock %}
+{% block page_subtitle %}AI Student Dropout Prediction{% endblock %}
+
+{% block content %}
+
+<div class="data-container">
+
+    <div class="cards-grid">
+
+        <!-- Total Students -->
+
+        <div class="summary-card card-yellow">
+
+            <div class="card-header">
+
+                <div class="card-title">
+
+                    <i class="ph ph-users"></i>
+
+                    <span>Total Students</span>
+
+                </div>
+
+                <button class="more-btn">
+
+                    <i class="ph ph-dots-three"></i>
+
+                </button>
+
+            </div>
+
+            <div class="card-value">
+
+                <span class="number">
+
+                    {{ total_students }}
+
+                </span>
+
+            </div>
+
+            <div class="card-footer">
+
+                <span class="subtitle">
+
+                    Registered Students
+
+                </span>
+
+                <a href="{{ url_for('students') }}" class="details-link">
+
+                    See Details
+
+                    <i class="ph ph-arrow-right"></i>
+
+                </a>
+
+            </div>
+
+        </div>
+
+        <!-- Pending Reports -->
+
+        <div class="summary-card card-pink">
+
+            <div class="card-header">
+
+                <div class="card-title">
+
+                    <i class="ph ph-file-text"></i>
+
+                    <span>Pending Reports</span>
+
+                </div>
+
+                <button class="more-btn">
+
+                    <i class="ph ph-dots-three"></i>
+
+                </button>
+
+            </div>
+
+            <div class="card-value">
+
+                <span class="number">
+
+                    {{ pending_reports }}
+
+                </span>
+
+            </div>
+
+            <div class="card-footer">
+
+                <span class="subtitle">
+
+                    Waiting Reports
+
+                </span>
+
+                <a href="{{ url_for('reports') }}" class="details-link">
+
+                    See Details
+
+                    <i class="ph ph-arrow-right"></i>
+
+                </a>
+
+            </div>
+
+        </div>
+                <!-- High Risk Students -->
+
+        <div class="summary-card card-blue">
+
+            <div class="card-header">
+
+                <div class="card-title">
+
+                    <i class="ph ph-warning-circle"></i>
+
+                    <span>High Risk Students</span>
+
+                </div>
+
+                <button class="more-btn">
+
+                    <i class="ph ph-dots-three"></i>
+
+                </button>
+
+            </div>
+
+            <div class="card-value">
+
+                <span class="number">
+
+                    {{ high_risk_students }}
+
+                </span>
+
+            </div>
+
+            <div class="card-footer">
+
+                <span class="subtitle">
+
+                    Need Immediate Attention
+
+                </span>
+
+                <a href="{{ url_for('high_risk') }}" class="details-link">
+
+                    See Details
+
+                    <i class="ph ph-arrow-right"></i>
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- CONTENT -->
+
+    <div class="content-grid">
+
+        <div class="main-panel">
+
+            <div class="panel-header">
+
+                <h2>Recent Activity</h2>
+
+                <button class="btn-outline">
+
+                    View All
+
+                </button>
+
+            </div>
+
+            <div class="placeholder-box">
+
+                <i class="ph ph-clock-counter-clockwise"></i>
+
+                <h3>No Recent Activity</h3>
+
+                <p>
+
+                    Recent student updates will appear here.
+
+                </p>
+
+            </div>
+
+        </div>
+
+        <div class="side-panel">
+
+            <div class="panel-header">
+
+                <h2>Quick Actions</h2>
+
+            </div>
+
+            <div class="quick-actions-list">
+                                <a href="{{ url_for('add_student') }}" class="action-btn">
+
+                    <div class="icon-circle bg-yellow">
+                        <i class="ph ph-user-plus"></i>
+                    </div>
+
+                    <div class="action-text">
+                        <h4>Add New Student</h4>
+                        <p>Create a new student record</p>
+                    </div>
+
+                    <i class="ph ph-arrow-up-right"></i>
+
+                </a>
+
+                <a href="{{ url_for('reports') }}" class="action-btn">
+
+                    <div class="icon-circle bg-pink">
+                        <i class="ph ph-file-plus"></i>
+                    </div>
+
+                    <div class="action-text">
+                        <h4>Generate Report</h4>
+                        <p>Run AI Prediction</p>
+                    </div>
+
+                    <i class="ph ph-arrow-up-right"></i>
+
+                </a>
+
+                <a href="{{ url_for('high_risk') }}" class="action-btn">
+
+                    <div class="icon-circle bg-blue">
+                        <i class="ph ph-warning-circle"></i>
+                    </div>
+
+                    <div class="action-text">
+                        <h4>High Risk Students</h4>
+                        <p>View Prediction Results</p>
+                    </div>
+
+                    <i class="ph ph-arrow-up-right"></i>
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

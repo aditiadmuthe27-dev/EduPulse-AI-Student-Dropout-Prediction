@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}High Risk Students{% endblock %}
+{% block nav_at_risk %}active{% endblock %}
+{% block page_title %}At-Risk Students{% endblock %}
+{% block page_subtitle %}Students requiring immediate attention{% endblock %}
+
+{% block content %}
+<div class="data-container">
+    <div class="main-panel" style="width: 100%;">
+        <div class="panel-header">
+            <h2 class="text-danger"><i class="ph ph-warning-circle"></i> High Risk Students</h2>
+        </div>
+        <div style="overflow-x: auto; margin-top: 20px;">
+            <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                <thead>
+                    <tr style="border-bottom: 2px solid #eee; color: #666;">
+                        <th style="padding: 12px;">ID</th>
+                        <th style="padding: 12px;">Name</th>
+                        <th style="padding: 12px;">GPA</th>
+                        <th style="padding: 12px;">Attendance</th>
+                        <th style="padding: 12px;">Risk Confidence</th>
+                        <th style="padding: 12px;">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in students %}
+                    <tr style="border-bottom: 1px solid #eee; background-color: #fff8f8;">
+                        <td style="padding: 12px;">{{ student.id }}</td>
+                        <td style="padding: 12px; font-weight: 500;">{{ student.name }}</td>
+                        <td style="padding: 12px;">{{ student.gpa }}</td>
+                        <td style="padding: 12px;">{{ student.attendance }}%</td>
+                        <td style="padding: 12px;">{{ student.risk_score|default(0.0)|round(2) }}%</td>
+                        <td style="padding: 12px;">
+                            <button class="btn-outline" style="padding: 5px 10px; font-size: 12px;">Email Alert</button>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" style="padding: 20px; text-align: center; color: #2e7d32;">
+                            <i class="ph ph-check-circle" style="font-size: 24px;"></i><br>
+                            No high-risk students found!
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}Profile{% endblock %}
+{% block page_title %}User Profile{% endblock %}
+{% block page_subtitle %}Manage your personal information{% endblock %}
+
+{% block content %}
+<div class="data-container">
+    <div class="main-panel" style="width: 100%; max-width: 600px; margin: 0 auto;">
+        <div class="panel-header">
+            <h2>Profile Details</h2>
+        </div>
+        <div style="margin-top: 20px; padding: 20px; border: 1px solid #eee; border-radius: 8px;">
+            <p><strong>Username:</strong> {{ current_user.username }}</p>
+            <p><strong>Email:</strong> {{ current_user.email }}</p>
+            <p><strong>Role:</strong> {{ current_user.role }}</p>
+            
+            {% if current_user.student %}
+                <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+                <h3>Linked Student Record</h3>
+                <p><strong>Name:</strong> {{ current_user.student.name }}</p>
+                <p><strong>GPA:</strong> {{ current_user.student.gpa }}</p>
+                <p><strong>Attendance:</strong> {{ current_user.student.attendance }}%</p>
+                <p><strong>Assignments Completed:</strong> {{ current_user.student.assignments_completed }}</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
