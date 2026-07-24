@@ -5,15 +5,407 @@
 {% block page_title %}Settings{% endblock %}
 {% block page_subtitle %}Configure system preferences{% endblock %}
 
+{% block extra_head %}
+<style>
+.settings-container {
+    display: flex;
+    gap: 30px;
+}
+.settings-sidebar {
+    width: 250px;
+    background: #fff;
+    border-radius: 18px;
+    padding: 20px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+    align-self: flex-start;
+}
+.settings-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+.settings-tab {
+    padding: 12px 15px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 500;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: 0.2s;
+}
+.settings-tab:hover {
+    background: #f1f5f9;
+    color: #0f172a;
+}
+.settings-tab.active {
+    background: #eff6ff;
+    color: #2563eb;
+}
+.settings-content-area {
+    flex: 1;
+    background: #fff;
+    border-radius: 18px;
+    padding: 30px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+}
+.settings-section {
+    display: none;
+    animation: fadeIn 0.3s ease-in-out;
+}
+.settings-section.active {
+    display: block;
+}
+.settings-section h3 {
+    margin-bottom: 25px;
+    font-size: 22px;
+    color: #0f172a;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 10px;
+}
+.form-group {
+    margin-bottom: 20px;
+}
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #475569;
+}
+.form-control {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    font-size: 15px;
+    font-family: 'Outfit', sans-serif;
+    outline: none;
+    transition: 0.2s;
+}
+.form-control:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+}
+.setting-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px solid #f1f5f9;
+}
+.setting-info h4 {
+    font-size: 16px;
+    color: #1e293b;
+    margin-bottom: 4px;
+}
+.setting-info p {
+    font-size: 14px;
+    color: #64748b;
+}
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 26px;
+}
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: #cbd5e1;
+    transition: .4s;
+    border-radius: 34px;
+}
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+input:checked + .slider {
+    background-color: #2563eb;
+}
+input:checked + .slider:before {
+    transform: translateX(24px);
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="data-container">
-    <div class="main-panel" style="width: 100%; max-width: 600px; margin: 0 auto;">
-        <div class="panel-header">
-            <h2>Application Settings</h2>
+    <div class="settings-container">
+        
+        <div class="settings-sidebar">
+            <div class="settings-menu">
+                <div class="settings-tab active" data-target="profile"><i class="ph ph-user"></i> Profile Update</div>
+                <div class="settings-tab" data-target="security"><i class="ph ph-shield-check"></i> Security & Password</div>
+                <div class="settings-tab" data-target="appearance"><i class="ph ph-palette"></i> Appearance & Theme</div>
+                <div class="settings-tab" data-target="notifications"><i class="ph ph-bell-ringing"></i> Notifications</div>
+                <div class="settings-tab" data-target="language"><i class="ph ph-translate"></i> Language & Region</div>
+                <div class="settings-tab" data-target="account"><i class="ph ph-gear"></i> Account Settings</div>
+                <div class="settings-tab text-danger" onclick="confirmLogout()" style="color: #ef4444;"><i class="ph ph-sign-out"></i> Logout</div>
+            </div>
         </div>
-        <div style="margin-top: 20px;">
-            <p>Settings panel coming soon. Currently, system configuration is managed via environment variables.</p>
+
+        <div class="settings-content-area">
+            
+            <!-- Profile Settings -->
+            <div class="settings-section active" id="profile">
+                <h3>Profile Update</h3>
+                <div style="display: flex; gap: 20px; align-items: center; margin-bottom: 25px;">
+                    <div style="width: 80px; height: 80px; border-radius: 50%; background: #dbeafe; display: flex; align-items: center; justify-content: center; font-size: 32px; color: #2563eb;">
+                        <i class="ph-fill ph-user"></i>
+                    </div>
+                    <div>
+                        <button class="btn-outline">Change Avatar</button>
+                        <p style="font-size: 13px; color: #64748b; margin-top: 5px;">JPG, GIF or PNG. Max size of 800K</p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" class="form-control" value="{{ current_user.username }}">
+                </div>
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" class="form-control" value="{{ current_user.email or '' }}" placeholder="Enter your email">
+                </div>
+                <button class="btn-primary" onclick="saveSettings(this)">Save Changes</button>
+            </div>
+
+            <!-- Security & Password -->
+            <div class="settings-section" id="security">
+                <h3>Security & Password</h3>
+                <div class="form-group">
+                    <label>Current Password</label>
+                    <input type="password" class="form-control" placeholder="••••••••">
+                </div>
+                <div class="form-group">
+                    <label>New Password</label>
+                    <input type="password" class="form-control" placeholder="New Password">
+                </div>
+                <div class="form-group">
+                    <label>Confirm New Password</label>
+                    <input type="password" class="form-control" placeholder="Confirm Password">
+                </div>
+                <div class="setting-item" style="margin-top: 30px;">
+                    <div class="setting-info">
+                        <h4>Two-Factor Authentication</h4>
+                        <p>Add an extra layer of security to your account.</p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <button class="btn-primary" style="margin-top: 20px;" onclick="saveSettings(this)">Update Password</button>
+            </div>
+
+            <!-- Appearance & Theme -->
+            <div class="settings-section" id="appearance">
+                <h3>Appearance & Theme</h3>
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <h4>Dark Mode</h4>
+                        <p>Switch between light and dark themes.</p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="darkModeToggle">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="form-group" style="margin-top: 20px;">
+                    <label>Accent Color</label>
+                    <select class="form-control" id="themeColorSelect">
+                        <option value="blue">Blue (Default)</option>
+                        <option value="indigo">Indigo</option>
+                        <option value="emerald">Emerald</option>
+                        <option value="rose">Rose</option>
+                    </select>
+                </div>
+                <button class="btn-primary" style="margin-top: 10px;" onclick="saveThemeSettings(this)">Apply Theme</button>
+            </div>
+
+            <!-- Notifications -->
+            <div class="settings-section" id="notifications">
+                <h3>Notification Settings</h3>
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <h4>Email Alerts for High-Risk Students</h4>
+                        <p>Receive an email when a student is predicted as high risk.</p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked id="notifHighRisk">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <h4>System Updates</h4>
+                        <p>Notifications about platform maintenance and updates.</p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked id="notifSystem">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <h4>Weekly Summary Reports</h4>
+                        <p>Receive a weekly digest of student analytics.</p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="notifWeekly">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <button class="btn-primary" style="margin-top: 20px;" onclick="saveSettings(this)">Save Preferences</button>
+            </div>
+
+            <!-- Language -->
+            <div class="settings-section" id="language">
+                <h3>Language & Region</h3>
+                <div class="form-group">
+                    <label>Language Selection</label>
+                    <select class="form-control" id="languageSelect">
+                        <option value="en">English (US)</option>
+                        <option value="en-gb">English (UK)</option>
+                        <option value="es">Español</option>
+                        <option value="fr">Français</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Timezone</label>
+                    <select class="form-control">
+                        <option>UTC (Universal Coordinated Time)</option>
+                        <option>EST (Eastern Standard Time)</option>
+                        <option>PST (Pacific Standard Time)</option>
+                        <option>IST (Indian Standard Time)</option>
+                    </select>
+                </div>
+                <button class="btn-primary" onclick="saveSettings(this)">Update Language</button>
+            </div>
+
+            <!-- Account Settings -->
+            <div class="settings-section" id="account">
+                <h3>Account Settings</h3>
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <h4>Data Sharing</h4>
+                        <p>Allow anonymous analytics to improve ML models.</p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="setting-item" style="margin-top: 30px; border: 1px solid #fee2e2; padding: 20px; border-radius: 10px; background: #fef2f2;">
+                    <div class="setting-info">
+                        <h4 style="color: #ef4444;">Danger Zone</h4>
+                        <p style="color: #b91c1c;">Permanently delete your account and all associated data.</p>
+                    </div>
+                    <button class="btn-outline" style="color: #ef4444; border-color: #ef4444;">Delete Account</button>
+                </div>
+            </div>
+
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const tabs = document.querySelectorAll(".settings-tab");
+    const sections = document.querySelectorAll(".settings-section");
+
+    tabs.forEach(tab => {
+        tab.addEventListener("click", () => {
+            if(tab.hasAttribute('onclick')) return;
+            tabs.forEach(t => t.classList.remove("active"));
+            sections.forEach(s => s.classList.remove("active"));
+            
+            tab.classList.add("active");
+            document.getElementById(tab.getAttribute("data-target")).classList.add("active");
+        });
+    });
+
+    // Load theme settings from localStorage
+    if (localStorage.getItem("darkMode") === "true") {
+        document.getElementById("darkModeToggle").checked = true;
+    }
+    const savedTheme = localStorage.getItem("themeColor");
+    if (savedTheme) {
+        document.getElementById("themeColorSelect").value = savedTheme;
+    }
+    
+    // Load notification preferences
+    ['notifHighRisk', 'notifSystem', 'notifWeekly'].forEach(id => {
+        const val = localStorage.getItem(id);
+        if (val !== null) document.getElementById(id).checked = (val === 'true');
+    });
+    
+    const savedLang = localStorage.getItem("language");
+    if (savedLang) document.getElementById("languageSelect").value = savedLang;
+});
+
+function confirmLogout() {
+    if (confirm("Are you sure you want to log out?")) {
+        window.location.href = "{{ url_for('logout') }}";
+    }
+}
+
+function saveSettings(btn) {
+    const originalText = btn.innerText;
+    btn.innerHTML = '<i class="ph ph-spinner ph-spin"></i> Saving...';
+    btn.disabled = true;
+    
+    // Save notifications to localStorage as an example of functional frontend settings
+    ['notifHighRisk', 'notifSystem', 'notifWeekly'].forEach(id => {
+        const el = document.getElementById(id);
+        if(el) localStorage.setItem(id, el.checked);
+    });
+    const lang = document.getElementById("languageSelect");
+    if(lang) localStorage.setItem("language", lang.value);
+    
+    setTimeout(() => {
+        btn.innerText = originalText;
+        btn.disabled = false;
+        if(typeof showToast === 'function') {
+            showToast("Settings saved successfully", "success");
+        } else {
+            alert("Settings saved successfully");
+        }
+    }, 800);
+}
+
+function saveThemeSettings(btn) {
+    const isDark = document.getElementById("darkModeToggle").checked;
+    const themeColor = document.getElementById("themeColorSelect").value;
+    
+    localStorage.setItem("darkMode", isDark);
+    localStorage.setItem("themeColor", themeColor);
+    
+    saveSettings(btn);
+    
+    // Apply changes instantly
+    if (typeof applyThemePreferences === 'function') {
+        applyThemePreferences();
+    }
+}
+</script>
 {% endblock %}

@@ -1,0 +1,195 @@
+{% extends 'base.html' %}
+
+{% block title %}Student Profile - {{ student.name }}{% endblock %}
+{% block nav_students %}active{% endblock %}
+{% block page_title %}Student Profile{% endblock %}
+{% block page_subtitle %}Detailed Analytics & Recommendations{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+.profile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+.profile-card {
+    background: #fff;
+    border-radius: 18px;
+    padding: 25px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+    margin-bottom: 25px;
+}
+.student-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+.info-box {
+    padding: 15px;
+    border-radius: 12px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+}
+.info-box.danger { background: #fef2f2; border-color: #fee2e2; }
+.info-box.warning { background: #fffbeb; border-color: #fef3c7; }
+.info-box.success { background: #f0fdf4; border-color: #dcfce7; }
+.info-box h4 { font-size: 14px; color: #64748b; margin-bottom: 5px; }
+.info-box p { font-size: 24px; font-weight: 700; color: #0f172a; }
+
+.progress-bar-bg {
+    width: 100%;
+    height: 10px;
+    background: #e2e8f0;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: 8px;
+}
+.progress-bar-fill {
+    height: 100%;
+    border-radius: 10px;
+    background: #3b82f6;
+    transition: width 1s ease-in-out;
+}
+.ai-recommendations {
+    list-style: none;
+    padding: 0;
+}
+.ai-recommendations li {
+    padding: 15px;
+    background: #f8fafc;
+    border-left: 4px solid #3b82f6;
+    margin-bottom: 10px;
+    border-radius: 0 8px 8px 0;
+    font-size: 15px;
+    color: #334155;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.ai-recommendations li i { font-size: 20px; color: #3b82f6; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="data-container">
+    <div class="profile-header">
+        <div style="display: flex; align-items: center; gap: 20px;">
+            <div style="width: 70px; height: 70px; border-radius: 50%; background: #dbeafe; display: flex; align-items: center; justify-content: center; font-size: 32px; color: #2563eb;">
+                <i class="ph-fill ph-student"></i>
+            </div>
+            <div>
+                <h2 style="font-size: 28px; color: #0f172a; margin-bottom: 5px;">{{ student.name }}</h2>
+                <p style="color: #64748b;">ID: {{ student.id }} | Dept: Computer Science</p>
+            </div>
+        </div>
+        <div style="display: flex; gap: 10px;">
+            <a href="mailto:{{ student.user.email if student.user else '' }}" class="btn-outline"><i class="ph ph-envelope-simple"></i> Email Student</a>
+            <a href="{{ url_for('predict', id=student.id) }}" class="btn-primary" onclick="this.innerHTML='<i class=\'loading-spinner\'></i> Analyzing...';"><i class="ph ph-brain"></i> Run AI Prediction</a>
+        </div>
+    </div>
+
+    <div class="student-info-grid" style="margin-bottom: 25px;">
+        <div class="info-box">
+            <h4>Current GPA</h4>
+            <p>{{ student.gpa }} / 4.0</p>
+            <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: {{ (student.gpa/4.0)*100 }}%; background: #8b5cf6;"></div></div>
+        </div>
+        <div class="info-box {{ 'danger' if student.attendance < 75 else ('warning' if student.attendance < 85 else 'success') }}">
+            <h4>Attendance</h4>
+            <p>{{ student.attendance }}%</p>
+            <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: {{ student.attendance }}%; background: {{ '#ef4444' if student.attendance < 75 else ('#f59e0b' if student.attendance < 85 else '#10b981') }};"></div></div>
+        </div>
+        <div class="info-box">
+            <h4>Assignments</h4>
+            <p>{{ student.assignments_completed }} Completed</p>
+        </div>
+        <div class="info-box {{ 'danger' if student.risk_label == 'High' else ('warning' if student.risk_label == 'Medium' else 'success') }}">
+            <h4>AI Risk Assessment</h4>
+            <p>{{ student.risk_label }} Risk</p>
+            <span style="font-size: 13px; color: #64748b;">Confidence: {{ student.risk_score|default(0)|round(2) }}%</span>
+        </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 25px;">
+        <!-- Left Column: Charts -->
+        <div class="profile-card">
+            <h3 style="margin-bottom: 20px; font-size: 18px; color: #0f172a;"><i class="ph ph-trend-up"></i> Risk Trend & Performance History</h3>
+            <canvas id="riskTrendChart" height="100"></canvas>
+        </div>
+
+        <!-- Right Column: AI Recommendations -->
+        <div class="profile-card">
+            <h3 style="margin-bottom: 20px; font-size: 18px; color: #0f172a;"><i class="ph ph-lightbulb"></i> AI Recommendations</h3>
+            <ul class="ai-recommendations">
+                {% if student.risk_label == 'High' %}
+                <li style="border-left-color: #ef4444;"><i class="ph ph-warning-circle" style="color: #ef4444;"></i> Schedule an immediate counseling session.</li>
+                <li style="border-left-color: #f59e0b;"><i class="ph ph-calendar-check" style="color: #f59e0b;"></i> Monitor attendance closely next week.</li>
+                {% elif student.risk_label == 'Medium' %}
+                <li style="border-left-color: #f59e0b;"><i class="ph ph-books" style="color: #f59e0b;"></i> Suggest joining a study group for peer support.</li>
+                <li style="border-left-color: #3b82f6;"><i class="ph ph-envelope" style="color: #3b82f6;"></i> Send an encouraging check-in email.</li>
+                {% else %}
+                <li style="border-left-color: #10b981;"><i class="ph ph-thumbs-up" style="color: #10b981;"></i> Student is performing well. No immediate action required.</li>
+                <li style="border-left-color: #8b5cf6;"><i class="ph ph-medal" style="color: #8b5cf6;"></i> Consider for advanced coursework or mentoring roles.</li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const ctx = document.getElementById('riskTrendChart').getContext('2d');
+    
+    // Determine gradient based on current risk
+    let lineColor = '#10b981';
+    let bgColor = 'rgba(16, 185, 129, 0.2)';
+    let riskScores = [20, 22, 18, 15, 12, 10]; // mock low risk data
+    
+    if ('{{ student.risk_label }}' === 'High') {
+        lineColor = '#ef4444';
+        bgColor = 'rgba(239, 68, 68, 0.2)';
+        riskScores = [40, 55, 65, 78, 85, 92]; // mock high risk data
+    } else if ('{{ student.risk_label }}' === 'Medium') {
+        lineColor = '#f59e0b';
+        bgColor = 'rgba(245, 158, 11, 0.2)';
+        riskScores = [30, 35, 45, 42, 50, 55]; // mock medium risk data
+    }
+    
+    // Override the last point with actual data if available
+    {% if student.risk_score %}
+        riskScores[5] = {{ student.risk_score }};
+    {% endif %}
+
+    const myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Current'],
+            datasets: [{
+                label: 'Risk Probability (%)',
+                data: riskScores,
+                borderColor: lineColor,
+                backgroundColor: bgColor,
+                borderWidth: 2,
+                pointBackgroundColor: lineColor,
+                pointRadius: 4,
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: { beginAtZero: true, max: 100 }
+            },
+            plugins: {
+                legend: { display: false }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

@@ -1,93 +1,165 @@
 {% extends "base.html" %}
 
+{% block title %}Students{% endblock %}
+{% block nav_students %}active{% endblock %}
+
+{% block page_title %}Students Data{% endblock %}
+{% block page_subtitle %}Manage all student records{% endblock %}
+
 {% block content %}
 
-<div class="data-container">
+<div class="students-wrapper">
 
-    <div class="main-panel" style="width:100%;">
+    <!-- ================= Header ================= -->
 
-        <div class="panel-header">
+    <div class="students-header">
+
+        <div>
 
             <h2>🎓 Student Records</h2>
 
+            <p>
+                Manage student details, AI predictions and reports.
+            </p>
+
+        </div>
+
+        <div class="header-actions">
+
+            <input
+                type="text"
+                id="studentSearch"
+                placeholder="Search Student..."
+            >
+
+            <button
+                class="btn-outline"
+                onclick="window.print()"
+            >
+                🖨 Print
+            </button>
+
+            <button
+                class="btn-outline"
+                onclick="exportTableToCSV('students.csv')"
+            >
+                📥 Export CSV
+            </button>
+
             <a href="{{ url_for('add_student') }}">
+
                 <button class="btn-primary">
-                    <i class="ph ph-user-plus"></i>
-                    Add Student
+
+                    ➕ Add Student
+
                 </button>
+
             </a>
 
         </div>
 
-        <div style="overflow-x:auto; margin-top:20px;">
+    </div>
 
-            <table class="student-table">
+    <!-- ================= Table ================= -->
 
-                <thead>
+    <div class="table-container">
 
-                    <tr style="border-bottom:2px solid #eee; color:#666;">
+        <table
+            class="student-table"
+            id="studentTable"
+        >
 
-                        <th style="padding:12px;">ID</th>
-                        <th style="padding:12px;">Name</th>
-                        <th style="padding:12px;">GPA</th>
-                        <th style="padding:12px;">Attendance</th>
-                        <th style="padding:12px;">Assignments</th>
-                        <th style="padding:12px;">Risk Label</th>
-                        <th style="padding:12px;">Confidence</th>
+            <thead>
 
-                    </tr>
+                <tr>
 
-                </thead>
+                    <th>ID</th>
 
-                <tbody>
-                    {% for student in students %}
+                    <th>Name</th>
 
-<tr style="border-bottom:1px solid #eee;">
+                    <th>GPA</th>
 
-    <td style="padding:12px;">{{ student.id }}</td>
+                    <th>Attendance</th>
 
-    <td style="padding:12px; font-weight:500;">
-        {{ student.name }}
-    </td>
+                    <th>Assignments</th>
 
-    <td style="padding:12px;">
-        {{ student.gpa }}
-    </td>
+                    <th>Risk</th>
 
-    <td style="padding:12px;">
-        {{ student.attendance }}%
-    </td>
+                    <th>Confidence</th>
 
-    <td style="padding:12px;">
-        {{ student.assignments_completed }}
-    </td>
+                    <th>Actions</th>
 
-    <td style="padding:12px;">
+                </tr>
+
+            </thead>
+
+            <tbody>
+                {% for student in students %}
+
+<tr>
+
+    <td>{{ student.id }}</td>
+
+    <td>{{ student.name }}</td>
+
+    <td>{{ student.gpa }}</td>
+
+    <td>{{ student.attendance }}%</td>
+
+    <td>{{ student.assignments_completed }}</td>
+
+    <td>
 
         {% if student.risk_label == "High" %}
 
-            <span style="color:#c62828;font-weight:bold;">
-                High Risk
+            <span class="badge bg-danger">
+                High
             </span>
 
         {% elif student.risk_label == "Medium" %}
 
-            <span style="color:#ef6c00;font-weight:bold;">
-                Medium Risk
+            <span class="badge bg-warning">
+                Medium
             </span>
 
         {% else %}
 
-            <span style="color:#2e7d32;font-weight:bold;">
-                Low Risk
+            <span class="badge bg-success">
+                Low
             </span>
 
         {% endif %}
 
     </td>
 
-    <td style="padding:12px;">
-        {{ student.risk_score|default(0)|round(2) }}%
+    <td>
+
+        {{ student.risk_score|round(2) }}%
+
+    </td>
+
+    <td>
+
+        <div class="action-buttons">
+
+            <a href="{{ url_for('predict', id=student.id) }}"
+               class="btn btn-primary btn-sm">
+                🤖 Predict
+            </a>
+
+            <a href="{{ url_for('edit_student', id=student.id) }}"
+               class="btn btn-warning btn-sm">
+                ✏ Edit
+            </a>
+
+            <a href="{{ url_for('delete_student', id=student.id) }}"
+               class="btn btn-danger btn-sm"
+               onclick="return confirm('Are you sure you want to delete this student?');">
+                🗑 Delete
+            </a>
+
+        </div>
+
     </td>
 
 </tr>
@@ -96,21 +168,82 @@
 
 <tr>
 
-    <td colspan="7" style="padding:20px;text-align:center;color:#888;">
-        No students found.
+    <td colspan="8" style="text-align:center;padding:30px;">
+
+        No Student Records Found
+
     </td>
 
 </tr>
 
 {% endfor %}
-                </tbody>
 
-            </table>
+</tbody>
 
-        </div>
-
-    </div>
+</table>
 
 </div>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+
+<script>
+
+function exportTableToCSV(filename){
+
+    let csv=[];
+
+    let rows=document.querySelectorAll("#studentTable tr");
+
+    rows.forEach(function(row){
+
+        let cols=row.querySelectorAll("td,th");
+
+        let data=[];
+
+        cols.forEach(function(col){
+
+            data.push('"' + col.innerText + '"');
+
+        });
+
+        csv.push(data.join(","));
+
+    });
+
+    let blob=new Blob([csv.join("\n")],{type:"text/csv"});
+
+    let link=document.createElement("a");
+
+    link.download=filename;
+
+    link.href=window.URL.createObjectURL(blob);
+
+    link.click();
+
+}
+
+
+document.getElementById("studentSearch").addEventListener("keyup",function(){
+
+    let value=this.value.toLowerCase();
+
+    let rows=document.querySelectorAll("#studentTable tbody tr");
+
+    rows.forEach(function(row){
+
+        row.style.display=row.innerText.toLowerCase().includes(value)
+
+        ? ""
+
+        : "none";
+
+    });
+
+});
+
+</script>
 
 {% endblock %}

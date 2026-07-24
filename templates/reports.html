@@ -5,6 +5,29 @@
 {% block page_title %}Reports{% endblock %}
 {% block page_subtitle %}Prediction History{% endblock %}
 
+{% block extra_head %}
+<style>
+.btn-action {
+    background: #f1f5f9;
+    border: none;
+    border-radius: 8px;
+    padding: 8px;
+    cursor: pointer;
+    color: #475569;
+    margin: 0 4px;
+    transition: 0.2s;
+    font-size: 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.btn-action:hover {
+    background: #e2e8f0;
+    color: #0f172a;
+}
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="data-container">
     <div class="main-panel" style="width: 100%;">
@@ -23,6 +46,7 @@
                         <th style="padding: 12px;">Status</th>
                         <th style="padding: 12px;">Confidence Score</th>
                         <th style="padding: 12px;">Generated At</th>
+                        <th style="padding: 12px; text-align: center;">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -39,10 +63,16 @@
                             {% endif %}
                         </td>
                         <td style="padding: 12px;">{{ report.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td style="padding: 12px; text-align: center;">
+                            <button onclick="downloadPDF(this)" class="btn-action" title="Download PDF"><i class="ph ph-download-simple"></i></button>
+                            <button onclick="printReport(this)" class="btn-action" title="Print"><i class="ph ph-printer"></i></button>
+                            <button onclick="shareLink({{ report.id }})" class="btn-action" title="Copy Link"><i class="ph ph-link"></i></button>
+                            <a href="mailto:?subject=Student Report %23{{ report.id }}&body=Check out the report for {{ report.student.name }}. Confidence Score: {% if report.confidence_score %}{{ report.confidence_score|round(2) }}%25{% else %}N/A{% endif %}" class="btn-action" title="Email Report" style="text-decoration: none;"><i class="ph ph-envelope-simple"></i></a>
+                        </td>
                     </tr>
                     {% else %}
                     <tr>
-                        <td colspan="5" style="padding: 20px; text-align: center; color: #888;">No reports generated yet.</td>
+                        <td colspan="6" style="padding: 20px; text-align: center; color: #888;">No reports generated yet.</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -50,4 +80,66 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function downloadPDF(btn) {
+    const row = btn.closest('tr');
+    const clone = row.cloneNode(true);
+    clone.removeChild(clone.lastElementChild); // remove actions column
+    
+    const container = document.createElement('div');
+    container.style.padding = '20px';
+    container.style.fontFamily = 'Outfit, sans-serif';
+    container.innerHTML = `
+        <h2 style="margin-bottom: 20px;">EduPulse Report</h2>
+        <table style="width: 100%; border-collapse: collapse; text-align: left;">
+            <thead>
+                <tr style="border-bottom: 2px solid #eee;">
+                    <th style="padding: 12px;">Report ID</th>
+                    <th style="padding: 12px;">Student Name</th>
+                    <th style="padding: 12px;">Status</th>
+                    <th style="padding: 12px;">Confidence Score</th>
+                    <th style="padding: 12px;">Generated At</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${clone.outerHTML}
+            </tbody>
+        </table>
+    `;
+    
+    html2pdf().from(container).save(`Report_${clone.cells[0].innerText.replace('#', '')}.pdf`);
+}
+
+function printReport(btn) {
+    const row = btn.closest('tr');
+    const clone = row.cloneNode(true);
+    clone.removeChild(clone.lastElementChild);
+    
+    const printWindow = window.open('', '', 'height=600,width=800');
+    printWindow.document.write('<html><head><title>Print Report</title>');
+    printWindow.document.write('<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&display=swap" rel="stylesheet">');
+    printWindow.document.write('<style>body { font-family: "Outfit", sans-serif; padding: 20px; } table { width: 100%; border-collapse: collapse; text-align: left; } th, td { padding: 12px; border-bottom: 1px solid #eee; }</style>');
+    printWindow.document.write('</head><body>');
+    printWindow.document.write('<h2 style="margin-bottom: 20px;">EduPulse Report</h2>');
+    printWindow.document.write('<table><thead><tr><th>Report ID</th><th>Student Name</th><th>Status</th><th>Confidence Score</th><th>Generated At</th></tr></thead><tbody>');
+    printWindow.document.write(clone.outerHTML);
+    printWindow.document.write('</tbody></table></body></html>');
+    printWindow.document.close();
+    printWindow.focus();
+    setTimeout(() => {
+        printWindow.print();
+        printWindow.close();
+    }, 500);
+}
+
+function shareLink(id) {
+    const link = window.location.origin + window.location.pathname + "#report-" + id;
+    navigator.clipboard.writeText(link).then(() => {
+        alert("Report link copied to clipboard!");
+    });
+}
+</script>
 {% endblock %}

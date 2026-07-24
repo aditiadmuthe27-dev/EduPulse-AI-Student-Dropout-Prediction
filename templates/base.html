@@ -9,6 +9,52 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        /* Toast Notification Styles */
+        #toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
+        .toast { padding: 15px 20px; border-radius: 8px; color: #fff; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); animation: slideIn 0.3s ease, fadeOut 0.5s ease 3.5s forwards; font-weight: 500; min-width: 250px; }
+        .toast.success { background: #10B981; }
+        .toast.error { background: #EF4444; }
+        .toast.info { background: #3B82F6; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
+        
+        /* Loading Indicator */
+        .loading-spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff; animation: spin 1s ease-in-out infinite; margin-right: 8px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Dark Mode Basic Overrides */
+        body.dark-theme { background-color: #0f172a; color: #f8fafc; }
+        body.dark-theme .main-content { background-color: #0f172a; }
+        body.dark-theme .topbar { background-color: #1e293b; border-color: #334155; }
+        body.dark-theme .search-bar { background-color: #0f172a; border-color: #334155; color: #f8fafc; }
+        body.dark-theme .search-bar input { color: #f8fafc; }
+        body.dark-theme .summary-card, body.dark-theme .main-panel, body.dark-theme .side-panel, body.dark-theme .settings-sidebar, body.dark-theme .settings-content-area { background-color: #1e293b; color: #f8fafc; box-shadow: none; border: 1px solid #334155; }
+        body.dark-theme h1, body.dark-theme h2, body.dark-theme h3, body.dark-theme h4, body.dark-theme .card-title, body.dark-theme .setting-info h4 { color: #f8fafc; }
+        body.dark-theme p, body.dark-theme .subtitle, body.dark-theme .setting-info p { color: #cbd5e1; }
+        body.dark-theme .student-table th { color: #94a3b8; border-color: #334155; }
+        body.dark-theme .student-table td { border-color: #334155; }
+        body.dark-theme tr { border-bottom: 1px solid #334155 !important; }
+        body.dark-theme .page-title h1 { color: #f8fafc; }
+        body.dark-theme .icon-btn { background: #334155; color: #f8fafc; }
+        body.dark-theme .form-control { background: #0f172a; border-color: #334155; color: #f8fafc; }
+        body.dark-theme .settings-tab:hover { background: #334155; color: #f8fafc; }
+        body.dark-theme .settings-tab.active { background: #2563eb; color: #fff; }
+    </style>
+    <script>
+        function applyThemePreferences() {
+            if (localStorage.getItem('darkMode') === 'true') {
+                document.body.classList.add('dark-theme');
+            } else {
+                document.body.classList.remove('dark-theme');
+            }
+            const themeColor = localStorage.getItem('themeColor') || 'blue';
+            // Simple placeholder for accent colors if needed
+        }
+        // Apply instantly on load
+        document.addEventListener("DOMContentLoaded", applyThemePreferences);
+    </script>
     {% block extra_head %}{% endblock %}
 </head>
 <body>
@@ -92,7 +138,7 @@
                 
                 <div class="search-bar">
                     <i class="ph ph-magnifying-glass"></i>
-                    <input type="text" placeholder="Search here...">
+                    <input type="text" id="globalSearchInput" placeholder="Search here...">
                     <span class="shortcut">⌘ F</span>
                 </div>
 
@@ -118,17 +164,20 @@
                 </div>
             </header>
 
+            <!-- Toast Container -->
+            <div id="toast-container"></div>
+            
             <!-- Dashboard Content -->
             <div class="dashboard-content" id="dashboardContent">
                 {% with messages = get_flashed_messages(with_categories=true) %}
                   {% if messages %}
-                    {% for category, message in messages %}
-                      <div style="padding: 15px; margin-bottom: 20px; border-radius: 8px; 
-                           background-color: {% if category == 'success' %}#e8f5e9{% else %}#ffebee{% endif %};
-                           color: {% if category == 'success' %}#2e7d32{% else %}#c62828{% endif %};">
-                        {{ message }}
-                      </div>
-                    {% endfor %}
+                    <script>
+                      document.addEventListener("DOMContentLoaded", function() {
+                        {% for category, message in messages %}
+                          showToast("{{ message }}", "{{ 'error' if category == 'error' else ('success' if category == 'success' else 'info') }}");
+                        {% endfor %}
+                      });
+                    </script>
                   {% endif %}
                 {% endwith %}
                 {% block content %}{% endblock %}
@@ -136,6 +185,66 @@
         </main>
     </div>
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script>
+        function showToast(message, type="info") {
+            const container = document.getElementById("toast-container");
+            const toast = document.createElement("div");
+            toast.className = `toast ${type}`;
+            let icon = "ph-info";
+            if (type === "success") icon = "ph-check-circle";
+            if (type === "error") icon = "ph-warning-circle";
+            toast.innerHTML = `<i class="ph ${icon}" style="font-size: 20px;"></i> <span>${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.remove();
+            }, 4000);
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const searchInput = document.getElementById("globalSearchInput");
+            if (searchInput) {
+                searchInput.addEventListener("input", function() {
+                    const query = this.value.toLowerCase();
+                    const tables = document.querySelectorAll("table tbody");
+                    tables.forEach(tbody => {
+                        let tableHasMatch = false;
+                        const rows = tbody.querySelectorAll("tr");
+                        rows.forEach(row => {
+                            if (row.cells.length === 1 && row.cells[0].colSpan > 1) return;
+                            
+                            const text = row.textContent.toLowerCase();
+                            if (text.includes(query)) {
+                                row.style.display = "";
+                                tableHasMatch = true;
+                            } else {
+                                row.style.display = "none";
+                            }
+                        });
+
+                        let noResultRow = tbody.querySelector(".no-results-row");
+                        if (!tableHasMatch && query !== "") {
+                            if (!noResultRow) {
+                                noResultRow = document.createElement("tr");
+                                noResultRow.className = "no-results-row";
+                                const td = document.createElement("td");
+                                td.colSpan = 10;
+                                td.style.padding = "20px";
+                                td.style.textAlign = "center";
+                                td.style.color = "#888";
+                                td.textContent = "No student found";
+                                noResultRow.appendChild(td);
+                                tbody.appendChild(noResultRow);
+                            }
+                            noResultRow.style.display = "";
+                        } else if (noResultRow) {
+                            noResultRow.style.display = "none";
+                        }
+                    });
+                });
+            }
+        });
+    </script>
     {% block extra_scripts %}{% endblock %}
 </body>
 </html>

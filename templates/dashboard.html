@@ -1,268 +1,321 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 
-{% block title %}Dashboard{% endblock %}
-{% block nav_dashboard %}active{% endblock %}
+{% block title %}
+Dashboard
+{% endblock %}
 
-{% block page_title %}Dashboard{% endblock %}
-{% block page_subtitle %}AI Student Dropout Prediction{% endblock %}
+
+{% block nav_dashboard %}
+active
+{% endblock %}
+
+
+{% block page_title %}
+Dashboard
+{% endblock %}
+
+
+{% block page_subtitle %}
+EduPulse AI Student Dropout Prediction System
+{% endblock %}
+
+
 
 {% block content %}
 
-<div class="data-container">
 
-    <div class="cards-grid">
+<!-- Dashboard Summary Cards -->
 
-        <!-- Total Students -->
+<div class="cards-grid">
 
-        <div class="summary-card card-yellow">
 
-            <div class="card-header">
+    <div class="summary-card card-blue">
 
-                <div class="card-title">
-
-                    <i class="ph ph-users"></i>
-
-                    <span>Total Students</span>
-
-                </div>
-
-                <button class="more-btn">
-
-                    <i class="ph ph-dots-three"></i>
-
-                </button>
-
-            </div>
-
-            <div class="card-value">
-
-                <span class="number">
-
-                    {{ total_students }}
-
-                </span>
-
-            </div>
-
-            <div class="card-footer">
-
-                <span class="subtitle">
-
-                    Registered Students
-
-                </span>
-
-                <a href="{{ url_for('students') }}" class="details-link">
-
-                    See Details
-
-                    <i class="ph ph-arrow-right"></i>
-
-                </a>
-
-            </div>
-
+        <div class="card-icon">
+            <i class="fas fa-users"></i>
         </div>
 
-        <!-- Pending Reports -->
-
-        <div class="summary-card card-pink">
-
-            <div class="card-header">
-
-                <div class="card-title">
-
-                    <i class="ph ph-file-text"></i>
-
-                    <span>Pending Reports</span>
-
-                </div>
-
-                <button class="more-btn">
-
-                    <i class="ph ph-dots-three"></i>
-
-                </button>
-
-            </div>
-
-            <div class="card-value">
-
-                <span class="number">
-
-                    {{ pending_reports }}
-
-                </span>
-
-            </div>
-
-            <div class="card-footer">
-
-                <span class="subtitle">
-
-                    Waiting Reports
-
-                </span>
-
-                <a href="{{ url_for('reports') }}" class="details-link">
-
-                    See Details
-
-                    <i class="ph ph-arrow-right"></i>
-
-                </a>
-
-            </div>
-
-        </div>
-                <!-- High Risk Students -->
-
-        <div class="summary-card card-blue">
-
-            <div class="card-header">
-
-                <div class="card-title">
-
-                    <i class="ph ph-warning-circle"></i>
-
-                    <span>High Risk Students</span>
-
-                </div>
-
-                <button class="more-btn">
-
-                    <i class="ph ph-dots-three"></i>
-
-                </button>
-
-            </div>
-
-            <div class="card-value">
-
-                <span class="number">
-
-                    {{ high_risk_students }}
-
-                </span>
-
-            </div>
-
-            <div class="card-footer">
-
-                <span class="subtitle">
-
-                    Need Immediate Attention
-
-                </span>
-
-                <a href="{{ url_for('high_risk') }}" class="details-link">
-
-                    See Details
-
-                    <i class="ph ph-arrow-right"></i>
-
-                </a>
-
-            </div>
-
+        <div class="card-content">
+            <h4>Total Students</h4>
+            <h2>{{ total_students }}</h2>
+            <p>Registered Students</p>
         </div>
 
     </div>
 
-    <!-- CONTENT -->
 
-    <div class="content-grid">
 
-        <div class="main-panel">
+    <div class="summary-card card-green">
 
-            <div class="panel-header">
-
-                <h2>Recent Activity</h2>
-
-                <button class="btn-outline">
-
-                    View All
-
-                </button>
-
-            </div>
-
-            <div class="placeholder-box">
-
-                <i class="ph ph-clock-counter-clockwise"></i>
-
-                <h3>No Recent Activity</h3>
-
-                <p>
-
-                    Recent student updates will appear here.
-
-                </p>
-
-            </div>
-
+        <div class="card-icon">
+            <i class="fas fa-user-check"></i>
         </div>
 
-        <div class="side-panel">
-
-            <div class="panel-header">
-
-                <h2>Quick Actions</h2>
-
-            </div>
-
-            <div class="quick-actions-list">
-                                <a href="{{ url_for('add_student') }}" class="action-btn">
-
-                    <div class="icon-circle bg-yellow">
-                        <i class="ph ph-user-plus"></i>
-                    </div>
-
-                    <div class="action-text">
-                        <h4>Add New Student</h4>
-                        <p>Create a new student record</p>
-                    </div>
-
-                    <i class="ph ph-arrow-up-right"></i>
-
-                </a>
-
-                <a href="{{ url_for('reports') }}" class="action-btn">
-
-                    <div class="icon-circle bg-pink">
-                        <i class="ph ph-file-plus"></i>
-                    </div>
-
-                    <div class="action-text">
-                        <h4>Generate Report</h4>
-                        <p>Run AI Prediction</p>
-                    </div>
-
-                    <i class="ph ph-arrow-up-right"></i>
-
-                </a>
-
-                <a href="{{ url_for('high_risk') }}" class="action-btn">
-
-                    <div class="icon-circle bg-blue">
-                        <i class="ph ph-warning-circle"></i>
-                    </div>
-
-                    <div class="action-text">
-                        <h4>High Risk Students</h4>
-                        <p>View Prediction Results</p>
-                    </div>
-
-                    <i class="ph ph-arrow-up-right"></i>
-
-                </a>
-
-            </div>
-
+        <div class="card-content">
+            <h4>Low Risk</h4>
+            <h2>{{ low_risk_students }}</h2>
+            <p>Safe Students</p>
         </div>
 
     </div>
+
+
+
+
+    <div class="summary-card card-orange">
+
+        <div class="card-icon">
+            <i class="fas fa-user-clock"></i>
+        </div>
+
+        <div class="card-content">
+            <h4>Medium Risk</h4>
+            <h2>{{ medium_risk_students }}</h2>
+            <p>Need Attention</p>
+        </div>
+
+    </div>
+
+
+
+
+
+    <div class="summary-card card-red">
+
+        <div class="card-icon">
+            <i class="fas fa-user-times"></i>
+        </div>
+
+        <div class="card-content">
+            <h4>High Risk</h4>
+            <h2>{{ high_risk_students }}</h2>
+            <p>Critical Students</p>
+        </div>
+
+    </div>
+
 
 </div>
+
+
+
+<!-- Dashboard Main Section -->
+
+<div class="dashboard-layout">
+
+
+    <div class="dashboard-box">
+
+        <div class="box-header">
+
+            <h3>
+                <i class="fas fa-chart-line"></i>
+                Dropout Risk Overview
+            </h3>
+
+        </div>
+
+
+        <div class="chart-area">
+
+            <canvas id="riskChart"></canvas>
+
+        </div>
+
+
+    </div>
+        <div class="dashboard-box recent-box">
+
+        <div class="box-header">
+
+            <h3>
+                <i class="fas fa-file-alt"></i>
+                Recent Reports
+            </h3>
+
+            <a href="/reports" class="view-btn">
+                View All
+            </a>
+
+        </div>
+
+
+        <div class="report-list">
+
+
+            {% if reports %}
+
+                {% for report in reports %}
+
+                <div class="report-item">
+
+                    <div>
+
+                        <h4>
+                            {{ report.student.name }}
+                        </h4>
+
+                        <p>
+                            Status:
+                            
+                            {% if report.status == "Completed" %}
+
+                            <span class="status-success">
+                                {{ report.status }}
+                            </span>
+
+                            {% else %}
+
+                            <span class="status-pending">
+                                {{ report.status }}
+                            </span>
+
+                            {% endif %}
+
+                        </p>
+
+                    </div>
+
+
+                    <div class="report-date">
+
+                        {{ report.created_at.strftime('%d %b %Y') }}
+
+                    </div>
+
+
+                </div>
+
+                {% endfor %}
+
+
+            {% else %}
+
+                <p class="empty-text">
+                    No reports available
+                </p>
+
+            {% endif %}
+
+
+        </div>
+
+
+    </div>
+
+
+</div>
+
+
+
+<!-- Quick Actions -->
+
+<div class="quick-actions">
+
+
+    <div class="action-card">
+
+        <i class="fas fa-user-plus"></i>
+
+        <h4>Add Student</h4>
+
+        <a href="/add_student">
+            Add Now
+        </a>
+
+    </div>
+
+
+
+    <div class="action-card">
+
+        <i class="fas fa-upload"></i>
+
+        <h4>Upload CSV</h4>
+
+        <a href="/upload">
+            Upload
+        </a>
+
+    </div>
+
+
+
+    <div class="action-card">
+
+        <i class="fas fa-download"></i>
+
+        <h4>Download Report</h4>
+
+        <a href="#">
+            Download
+        </a>
+
+    </div>
+
+
+</div>
+
+
+
+<!-- Chart Script -->
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+<script>
+
+const ctx = document.getElementById('riskChart');
+
+
+new Chart(ctx, {
+
+    type: 'doughnut',
+
+    data: {
+
+        labels: [
+            'Low Risk',
+            'Medium Risk',
+            'High Risk'
+        ],
+
+
+        datasets: [{
+
+            data: [
+
+                {{ low_risk_students }},
+                {{ medium_risk_students }},
+                {{ high_risk_students }}
+
+            ]
+
+        }]
+
+    },
+
+
+    options: {
+
+        responsive:true,
+
+        plugins: {
+
+            legend: {
+
+                position:'bottom'
+
+            }
+
+        }
+
+    }
+
+});
+
+
+</script>
+
 
 {% endblock %}

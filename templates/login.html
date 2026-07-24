@@ -1,8 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>EduPulse | Login</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -29,23 +33,19 @@
             background:#ffffff;
             padding:45px;
             border-radius:22px;
-            border:1px solid #E5E7EB;
-            box-shadow:0 20px 45px rgba(0,0,0,0.20);
+            box-shadow:0 20px 45px rgba(0,0,0,.20);
         }
 
         h2{
             text-align:center;
             color:#1E3A8A;
             margin-bottom:10px;
-            font-size:30px;
-            font-weight:700;
         }
 
         p{
             text-align:center;
             color:#6B7280;
             margin-bottom:30px;
-            font-size:15px;
         }
 
         .form-group{
@@ -55,7 +55,6 @@
         label{
             display:block;
             margin-bottom:8px;
-            color:#374151;
             font-weight:600;
         }
 
@@ -64,71 +63,26 @@
             padding:14px;
             border:2px solid #D1D5DB;
             border-radius:12px;
-            font-size:15px;
-            transition:0.3s;
         }
 
         input:focus{
             outline:none;
             border-color:#2563EB;
-            box-shadow:0 0 12px rgba(37,99,235,.25);
         }
 
         .btn-primary{
             width:100%;
             padding:14px;
-            margin-top:10px;
             border:none;
             border-radius:12px;
-            background:linear-gradient(90deg,#2563EB,#4F46E5);
+            background:#2563EB;
             color:white;
             font-size:16px;
-            font-weight:600;
             cursor:pointer;
-            transition:0.3s;
         }
 
         .btn-primary:hover{
-            transform:translateY(-2px);
-            box-shadow:0 10px 25px rgba(79,70,229,.35);
-        }
-
-        .text-center{
-            text-align:center;
-            margin-top:20px;
-        }
-
-        .text-center a{
-            color:#2563EB;
-            text-decoration:none;
-            font-weight:600;
-        }
-
-        .text-center a:hover{
-            text-decoration:underline;
-        }
-
-        .flashes{
-            list-style:none;
-            margin-bottom:20px;
-        }
-
-        .flash{
-            padding:12px;
-            border-radius:10px;
-            margin-bottom:10px;
-            text-align:center;
-            font-weight:500;
-        }
-
-        .flash.success{
-            background:#DCFCE7;
-            color:#166534;
-        }
-
-        .flash.danger{
-            background:#FEE2E2;
-            color:#B91C1C;
+            background:#1D4ED8;
         }
 
     </style>
@@ -140,13 +94,15 @@
 <div class="auth-container">
 
     <h2>EduPulse Login</h2>
-    <p>Welcome Back! Please login to continue.</p>
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
+    <p>Welcome Back! Please login to continue.</p>
+        {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
-            <ul class="flashes">
+            <ul style="list-style:none; margin-bottom:20px;">
                 {% for category, message in messages %}
-                    <li class="flash {{ category }}">{{ message }}</li>
+                    <li style="padding:12px; border-radius:10px; margin-bottom:10px; background:#DCFCE7; color:#166534; text-align:center;">
+                        {{ message }}
+                    </li>
                 {% endfor %}
             </ul>
         {% endif %}
@@ -156,27 +112,46 @@
 
         <div class="form-group">
             <label>Username</label>
-            <input type="text" name="username" placeholder="Enter your username" required>
+
+            <input
+                type="text"
+                name="username"
+                placeholder="Enter Username"
+                required
+            >
         </div>
 
         <div class="form-group">
             <label>Password</label>
-            <input type="password" name="password" placeholder="Enter your password" required>
+
+            <input
+                type="password"
+                name="password"
+                placeholder="Enter Password"
+                required
+            >
         </div>
 
-        <button type="submit" class="btn-primary">
+        <button
+            type="submit"
+            class="btn-primary">
             Login
         </button>
 
     </form>
+        <div class="text-center" style="margin-top:20px; text-align:center;">
 
-    <div class="text-center">
-        <a href="{{ url_for('register') }}">
+        <a
+            href="{{ url_for('register') }}"
+            style="text-decoration:none; color:#2563EB; font-weight:600;"
+        >
             Don't have an account? Register
         </a>
+
     </div>
 
 </div>
 
 </body>
+
 </html>
