@@ -1,0 +1,224 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+{% block nav_dashboard %}active{% endblock %}
+
+{% block page_title %}Welcome, Admin 👋{% endblock %}
+{% block page_subtitle %}Here's what's happening with your students today{% endblock %}
+
+{% block content %}
+<div class="data-container" id="mainData">
+
+    <div class="cards-grid stat-cards">
+        <div class="summary-card stat-total">
+            <div class="stat-icon"><i class="ph-fill ph-users-three"></i></div>
+            <div class="stat-info">
+                <span class="stat-label">Total Students</span>
+                <span class="stat-value">{{ total_students }}</span>
+                <span class="stat-sub"><i class="ph-fill ph-graduation-cap"></i> All Enrolled Students</span>
+            </div>
+        </div>
+
+        <div class="summary-card stat-low">
+            <div class="stat-icon"><i class="ph-fill ph-graduation-cap"></i></div>
+            <div class="stat-info">
+                <span class="stat-label">Low Risk</span>
+                <span class="stat-value">{{ low_risk_students }}</span>
+                <span class="stat-sub">{{ "%.1f"|format((low_risk_students / total_students * 100) if total_students else 0) }}% of Students</span>
+            </div>
+        </div>
+
+        <div class="summary-card stat-medium">
+            <div class="stat-icon"><i class="ph-fill ph-warning-circle"></i></div>
+            <div class="stat-info">
+                <span class="stat-label">At Risk</span>
+                <span class="stat-value">{{ medium_risk_students }}</span>
+                <span class="stat-sub">{{ "%.1f"|format((medium_risk_students / total_students * 100) if total_students else 0) }}% of Students</span>
+            </div>
+        </div>
+
+        <div class="summary-card stat-high">
+            <div class="stat-icon"><i class="ph-fill ph-trend-down"></i></div>
+            <div class="stat-info">
+                <span class="stat-label">High Risk</span>
+                <span class="stat-value">{{ high_risk_students }}</span>
+                <span class="stat-sub">{{ "%.1f"|format((high_risk_students / total_students * 100) if total_students else 0) }}% of Students</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-grid two-col" id="analytics">
+        <div class="chart-panel">
+            <div class="panel-header">
+                <h2>Dropout Risk Distribution</h2>
+            </div>
+            <div class="donut-wrapper">
+                <div class="donut-chart-holder">
+                    <canvas id="riskDonutChart"></canvas>
+                    <div class="donut-center">
+                        <span class="donut-total">{{ total_students }}</span>
+                        <span class="donut-label">Students</span>
+                    </div>
+                </div>
+                <div class="donut-legend">
+                    <div class="legend-item">
+                        <span class="dot dot-low"></span>
+                        <div>
+                            <strong>Low Risk</strong>
+                            <p>{{ "%.1f"|format((low_risk_students / total_students * 100) if total_students else 0) }}% ({{ low_risk_students }})</p>
+                        </div>
+                    </div>
+                    <div class="legend-item">
+                        <span class="dot dot-medium"></span>
+                        <div>
+                            <strong>At Risk</strong>
+                            <p>{{ "%.1f"|format((medium_risk_students / total_students * 100) if total_students else 0) }}% ({{ medium_risk_students }})</p>
+                        </div>
+                    </div>
+                    <div class="legend-item">
+                        <span class="dot dot-high"></span>
+                        <div>
+                            <strong>High Risk</strong>
+                            <p>{{ "%.1f"|format((high_risk_students / total_students * 100) if total_students else 0) }}% ({{ high_risk_students }})</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="chart-panel">
+            <div class="panel-header">
+                <h2>Dropout Risk Trend</h2>
+                <select class="range-select" id="trendRange">
+                    <option>Last 6 Months</option>
+                </select>
+            </div>
+            <div class="trend-chart-holder">
+                <canvas id="riskTrendChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-grid two-col-wide">
+        <div class="main-panel table-panel">
+            <div class="panel-header">
+                <h2>Students at High Risk</h2>
+                <a href="{{ url_for('high_risk') }}" class="btn-outline">View All</a>
+            </div>
+            <div class="table-responsive">
+                <table class="pro-table">
+                    <thead>
+                        <tr>
+                            <th>Student ID</th>
+                            <th>Name</th>
+                            <th>Risk Level</th>
+                            <th>Dropout Probability</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for s in high_risk_list %}
+                        <tr>
+                            <td>STU{{ "%04d"|format(s.id) }}</td>
+                            <td>{{ s.name }}</td>
+                            <td><span class="badge-risk badge-high">High Risk</span></td>
+                            <td>{{ "%.2f"|format(s.risk_score or 0) }}</td>
+                            <td>
+                                <a href="{{ url_for('edit_student', student_id=s.id) }}" class="icon-action"><i class="ph ph-eye"></i></a>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="5" class="empty-row">No high-risk students yet.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="side-panel chart-panel">
+            <div class="panel-header">
+                <h2>Feature Importance (Top 5)</h2>
+            </div>
+            <div class="feature-chart-holder">
+                <canvas id="featureImportanceChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-grid two-col action-row">
+        <div class="side-panel">
+            <div class="panel-header">
+                <h2>Quick Actions</h2>
+            </div>
+            <div class="quick-actions-list">
+                <a href="{{ url_for('add_student') }}" class="action-btn">
+                    <div class="icon-circle bg-blue"><i class="ph ph-user-plus"></i></div>
+                    <div class="action-text">
+                        <h4>Add New Student</h4>
+                        <p>Create a new student record</p>
+                    </div>
+                    <i class="ph ph-arrow-up-right"></i>
+                </a>
+                <button class="action-btn" onclick="window.print()">
+                    <div class="icon-circle bg-green"><i class="ph ph-printer"></i></div>
+                    <div class="action-text">
+                        <h4>Print Report</h4>
+                        <p>Print the current dashboard view</p>
+                    </div>
+                    <i class="ph ph-arrow-up-right"></i>
+                </button>
+                <a href="{{ url_for('export_csv') }}" class="action-btn">
+                    <div class="icon-circle bg-orange"><i class="ph ph-download-simple"></i></div>
+                    <div class="action-text">
+                        <h4>Export CSV Report</h4>
+                        <p>Download all student data</p>
+                    </div>
+                    <i class="ph ph-arrow-up-right"></i>
+                </a>
+            </div>
+        </div>
+
+        <div class="side-panel">
+            <div class="panel-header">
+                <h2>Share &amp; Import</h2>
+            </div>
+            <div class="quick-actions-list">
+                <button class="action-btn" id="shareReportBtn">
+                    <div class="icon-circle bg-blue"><i class="ph ph-share-network"></i></div>
+                    <div class="action-text">
+                        <h4>Share Report</h4>
+                        <p>Copy a shareable dashboard link</p>
+                    </div>
+                    <i class="ph ph-arrow-up-right"></i>
+                </button>
+                <form action="{{ url_for('import_csv') }}" method="POST" enctype="multipart/form-data" class="action-btn upload-form">
+                    <div class="icon-circle bg-green"><i class="ph ph-upload-simple"></i></div>
+                    <div class="action-text">
+                        <h4>Upload CSV</h4>
+                        <p>Bulk import student records</p>
+                        <input type="file" name="csv_file" accept=".csv" onchange="this.form.submit()">
+                    </div>
+                    <i class="ph ph-arrow-up-right"></i>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    window.dashboardData = {
+        lowRisk: {{ low_risk_students }},
+        mediumRisk: {{ medium_risk_students }},
+        highRisk: {{ high_risk_students }},
+        trendMonths: {{ trend_months|tojson }},
+        trendLow: {{ trend_low|tojson }},
+        trendMedium: {{ trend_medium|tojson }},
+        trendHigh: {{ trend_high|tojson }}
+    };
+</script>
+<script src="{{ url_for('static', filename='js/dashboard-charts.js') }}"></script>
+{% endblock %}

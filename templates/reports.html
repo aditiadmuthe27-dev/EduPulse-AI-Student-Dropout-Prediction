@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block title %}Reports{% endblock %}
+{% block nav_reports %}active{% endblock %}
+
+{% block page_title %}Reports{% endblock %}
+{% block page_subtitle %}Track dropout risk reports and their status{% endblock %}
+
+{% block content %}
+<div class="toolbar">
+    <div></div>
+    <div class="toolbar-actions">
+        <a href="{{ url_for('export_csv') }}" class="btn-soft"><i class="ph ph-download-simple"></i> Export CSV</a>
+        <button class="btn-soft" onclick="window.print()"><i class="ph ph-printer"></i> Print</button>
+    </div>
+</div>
+
+<div class="page-card table-panel">
+    <div class="table-responsive">
+        <table class="pro-table">
+            <thead>
+                <tr>
+                    <th>Report ID</th>
+                    <th>Student</th>
+                    <th>Status</th>
+                    <th>Created At</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in reports %}
+                <tr>
+                    <td>RPT{{ "%04d"|format(r.id) }}</td>
+                    <td>{{ r.student.name }}</td>
+                    <td>
+                        {% if r.status == 'Pending' %}
+                            <span class="badge-risk badge-medium">Pending</span>
+                        {% else %}
+                            <span class="badge-risk badge-low">{{ r.status }}</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ r.created_at.strftime('%d %b %Y') }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4" class="empty-row">No reports generated yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

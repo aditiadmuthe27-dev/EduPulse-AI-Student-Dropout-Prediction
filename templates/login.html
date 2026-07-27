@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduPulse - Sign In / Register</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+</head>
+<body class="auth-body">
+    <div class="auth-overlay"></div>
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <div class="logo">
+                    <i class="ph-fill ph-pulse"></i>
+                    <span>EduPulse</span>
+                </div>
+                <h2>AI Student Dropout Prediction</h2>
+                <p>Access the academic analytics platform</p>
+            </div>
+
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flash-messages">
+                        {% for category, message in messages %}
+                            <div class="flash-message {{ category }}">
+                                <i class="ph {% if category == 'success' %}ph-check-circle{% else %}ph-warning-circle{% endif %}"></i>
+                                <span>{{ message }}</span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            <div class="auth-tabs">
+                <button type="button" class="auth-tab active" id="tabLogin" onclick="switchTab('login')">Sign In</button>
+                <button type="button" class="auth-tab" id="tabRegister" onclick="switchTab('register')">Register</button>
+                <div class="tab-slider"></div>
+            </div>
+
+            <!-- Login Form -->
+            <form action="{{ url_for('login') }}" method="POST" id="formLogin" class="auth-form active">
+                <input type="hidden" name="action" value="login">
+                
+                <div class="form-group">
+                    <label for="loginUsername">Username or Email</label>
+                    <div class="input-wrapper">
+                        <i class="ph ph-user"></i>
+                        <input type="text" id="loginUsername" name="username" placeholder="Enter username or email" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <div class="input-wrapper">
+                        <i class="ph ph-lock"></i>
+                        <input type="password" id="loginPassword" name="password" placeholder="Enter your password" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-primary auth-submit-btn">
+                    <span>Sign In</span>
+                    <i class="ph ph-arrow-right"></i>
+                </button>
+            </form>
+
+            <!-- Register Form -->
+            <form action="{{ url_for('login') }}" method="POST" id="formRegister" class="auth-form">
+                <input type="hidden" name="action" value="register">
+
+                <div class="form-group">
+                    <label for="regUsername">Username</label>
+                    <div class="input-wrapper">
+                        <i class="ph ph-user"></i>
+                        <input type="text" id="regUsername" name="username" placeholder="Choose a username" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="regEmail">Email Address</label>
+                    <div class="input-wrapper">
+                        <i class="ph ph-envelope"></i>
+                        <input type="email" id="regEmail" name="email" placeholder="name@edupulse.edu" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="regPassword">Password</label>
+                    <div class="input-wrapper">
+                        <i class="ph ph-lock"></i>
+                        <input type="password" id="regPassword" name="password" placeholder="Create a strong password" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="regConfirmPassword">Confirm Password</label>
+                    <div class="input-wrapper">
+                        <i class="ph ph-lock-key"></i>
+                        <input type="password" id="regConfirmPassword" name="confirm_password" placeholder="Confirm your password" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-primary auth-submit-btn">
+                    <span>Create Account</span>
+                    <i class="ph ph-user-plus"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tab) {
+            const tabLogin = document.getElementById('tabLogin');
+            const tabRegister = document.getElementById('tabRegister');
+            const formLogin = document.getElementById('formLogin');
+            const formRegister = document.getElementById('formRegister');
+            const slider = document.querySelector('.tab-slider');
+
+            if (tab === 'login') {
+                tabLogin.classList.add('active');
+                tabRegister.classList.remove('active');
+                formLogin.classList.add('active');
+                formRegister.classList.remove('active');
+                slider.style.transform = 'translateX(0)';
+            } else {
+                tabLogin.classList.remove('active');
+                tabRegister.classList.add('active');
+                formLogin.classList.remove('active');
+                formRegister.classList.add('active');
+                slider.style.transform = 'translateX(100%)';
+            }
+        }
+        
+        // Auto-switch tabs if registration error occurred
+        {% if request.method == "POST" and request.form.get("action") == "register" %}
+            switchTab('register');
+        {% endif %}
+    </script>
+</body>
+</html>

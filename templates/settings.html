@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+
+{% block title %}Settings{% endblock %}
+{% block nav_settings %}active{% endblock %}
+
+{% block page_title %}Settings{% endblock %}
+{% block page_subtitle %}Manage your profile, preferences and account{% endblock %}
+
+{% block content %}
+<div class="settings-grid">
+
+    <div class="settings-card">
+        <h3><i class="ph ph-user-circle"></i> Profile Settings</h3>
+        <div class="form-grid" style="margin-bottom:0;">
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" value="Admin User">
+            </div>
+            <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" value="admin@edupulse.edu">
+            </div>
+            <div class="form-group">
+                <label>Role</label>
+                <input type="text" value="Administrator" disabled>
+            </div>
+            <div class="form-group">
+                <label>Department</label>
+                <input type="text" value="Academic Affairs">
+            </div>
+        </div>
+        <div class="form-actions" style="margin-top:20px;">
+            <button type="button" class="btn-primary"><i class="ph ph-floppy-disk"></i> Save Changes</button>
+        </div>
+    </div>
+
+    <div class="settings-card">
+        <h3><i class="ph ph-palette"></i> Theme Settings</h3>
+        <div class="theme-options">
+            <div class="theme-option active">Light</div>
+            <div class="theme-option">Dark</div>
+            <div class="theme-option">System</div>
+        </div>
+        <div class="settings-row">
+            <div class="settings-row-text">
+                <h4>Compact Sidebar</h4>
+                <p>Collapse sidebar by default</p>
+            </div>
+            <label class="switch">
+                <input type="checkbox">
+                <span class="switch-slider"></span>
+            </label>
+        </div>
+        <div class="settings-row">
+            <div class="settings-row-text">
+                <h4>Animations</h4>
+                <p>Enable smooth transitions across the UI</p>
+            </div>
+            <label class="switch">
+                <input type="checkbox" checked>
+                <span class="switch-slider"></span>
+            </label>
+        </div>
+    </div>
+
+    <div class="settings-card">
+        <h3><i class="ph ph-bell-ringing"></i> Notification Settings</h3>
+        <div class="settings-row">
+            <div class="settings-row-text">
+                <h4>High-Risk Alerts</h4>
+                <p>Get notified when a student becomes high risk</p>
+            </div>
+            <label class="switch">
+                <input type="checkbox" checked>
+                <span class="switch-slider"></span>
+            </label>
+        </div>
+        <div class="settings-row">
+            <div class="settings-row-text">
+                <h4>Weekly Summary Email</h4>
+                <p>Receive a weekly dropout risk summary</p>
+            </div>
+            <label class="switch">
+                <input type="checkbox" checked>
+                <span class="switch-slider"></span>
+            </label>
+        </div>
+        <div class="settings-row">
+            <div class="settings-row-text">
+                <h4>Report Status Updates</h4>
+                <p>Notify when a report status changes</p>
+            </div>
+            <label class="switch">
+                <input type="checkbox">
+                <span class="switch-slider"></span>
+            </label>
+        </div>
+    </div>
+
+    <div class="settings-card">
+        <h3><i class="ph ph-shield-check"></i> Account Settings</h3>
+        <div class="form-grid" style="margin-bottom:0;">
+            <div class="form-group full">
+                <label>Current Password</label>
+                <input type="password" placeholder="••••••••">
+            </div>
+            <div class="form-group">
+                <label>New Password</label>
+                <input type="password" placeholder="••••••••">
+            </div>
+            <div class="form-group">
+                <label>Confirm Password</label>
+                <input type="password" placeholder="••••••••">
+            </div>
+        </div>
+        <div class="form-actions" style="margin-top:20px;">
+            <button type="button" class="btn-primary"><i class="ph ph-lock-key"></i> Update Password</button>
+            <a href="#" class="text-danger">Deactivate Account</a>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
