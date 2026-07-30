@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 
 from extensions import db
 from models import Student, Report, User
+from ml_model import predict_risk
 
 app = Flask(__name__)
 app.secret_key = "edupulse_secure_secret_key_2026"
@@ -32,11 +33,41 @@ def require_login():
             return redirect(url_for("login"))
 
 
+AT_RISK_LABELS = ("Medium", "At Risk", "at risk", "medium")
+HIGH_RISK_LABELS = ("High", "high")
+LOW_RISK_LABELS = ("Low", "low")
+
+
+def normalize_risk_label(label):
+    if not label:
+        return "Low"
+    normalized = label.strip()
+    if normalized.lower() in ("at risk", "medium"):
+        return "Medium"
+    if normalized.lower() == "high":
+        return "High"
+    if normalized.lower() == "low":
+        return "Low"
+    return normalized
+
+
+def apply_risk_prediction(student):
+    risk_score, risk_label = predict_risk(
+        student.gpa,
+        student.attendance,
+        student.assignments_completed,
+    )
+    student.risk_score = risk_score
+    student.risk_label = risk_label
+
+
 def get_risk_counts():
     total_students = Student.query.count()
-    high_risk_students = Student.query.filter_by(risk_label="High").count()
-    medium_risk_students = Student.query.filter_by(risk_label="Medium").count()
-    low_risk_students = Student.query.filter_by(risk_label="Low").count()
+    high_risk_students = Student.query.filter(Student.risk_label.in_(HIGH_RISK_LABELS)).count()
+    medium_risk_students = Student.query.filter(Student.risk_label.in_(AT_RISK_LABELS)).count()
+    low_risk_students = Student.query.filter(Student.risk_label.in_(LOW_RISK_LABELS)).count()
+    unclassified = total_students - (high_risk_students + medium_risk_students + low_risk_students)
+    low_risk_students += unclassified
     return total_students, high_risk_students, medium_risk_students, low_risk_students
 
 
@@ -116,7 +147,12 @@ def dashboard():
     total_students, high_risk_students, medium_risk_students, low_risk_students = get_risk_counts()
     pending_reports = Report.query.filter_by(status="Pending").count()
 
-    high_risk_list = Student.query.filter_by(risk_label="High").order_by(Student.risk_score.desc()).limit(6).all()
+    high_risk_list = (
+        Student.query.filter(Student.risk_label.in_(HIGH_RISK_LABELS))
+        .order_by(Student.risk_score.desc())
+        .limit(6)
+        .all()
+    )
 
     months, low_series, medium_series, high_series = get_trend_data()
 
@@ -162,9 +198,8 @@ def add_student():
             gpa=float(request.form["gpa"]),
             attendance=float(request.form["attendance"]),
             assignments_completed=int(request.form["assignments_completed"]),
-            risk_score=0.0,
-            risk_label="Low"
         )
+        apply_risk_prediction(student)
 
         db.session.add(student)
         db.session.commit()
@@ -184,6 +219,7 @@ def edit_student(student_id):
         student.gpa = float(request.form["gpa"])
         student.attendance = float(request.form["attendance"])
         student.assignments_completed = int(request.form["assignments_completed"])
+        apply_risk_prediction(student)
 
         db.session.commit()
 
@@ -216,7 +252,11 @@ def reports():
 @app.route("/high-risk")
 def high_risk():
 
-    students_list = Student.query.filter_by(risk_label="High").all()
+    students_list = (
+        Student.query.filter(Student.risk_label.in_(AT_RISK_LABELS))
+        .order_by(Student.risk_score.desc())
+        .all()
+    )
 
     return render_template(
         "high_risk.html",
@@ -261,14 +301,25 @@ def import_csv():
 
     for row in reader:
         try:
+            raw_label = row.get("Risk Label") or row.get("risk_label") or ""
+            raw_score = row.get("Risk Score") or row.get("risk_score")
+
             student = Student(
                 name=row.get("Name") or row.get("name"),
                 gpa=float(row.get("GPA") or row.get("gpa") or 0),
                 attendance=float(row.get("Attendance") or row.get("attendance") or 0),
                 assignments_completed=int(row.get("Assignments Completed") or row.get("assignments_completed") or 0),
-                risk_score=float(row.get("Risk Score") or row.get("risk_score") or 0),
-                risk_label=row.get("Risk Label") or row.get("risk_label") or "Low"
             )
+
+            if raw_label:
+                student.risk_label = normalize_risk_label(raw_label)
+                student.risk_score = float(raw_score) if raw_score not in (None, "") else None
+            else:
+                apply_risk_prediction(student)
+
+            if student.risk_score is None:
+                apply_risk_prediction(student)
+
             db.session.add(student)
         except (TypeError, ValueError):
             continue

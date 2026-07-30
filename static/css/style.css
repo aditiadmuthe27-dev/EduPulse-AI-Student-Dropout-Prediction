@@ -966,9 +966,9 @@ p { font-size: 14px; color: var(--text-muted); }
     flex-shrink: 0;
 }
 
-.dot-low { background: #22c55e; }
-.dot-medium { background: #f59e0b; }
-.dot-high { background: #ef4444; }
+.dot-low { background: #16a34a; }
+.dot-medium { background: #d97706; }
+.dot-high { background: #dc2626; }
 
 .trend-chart-holder {
     height: 260px;

@@ -24,6 +24,7 @@
                     <th>Name</th>
                     <th>GPA</th>
                     <th>Attendance</th>
+                    <th>Risk Level</th>
                     <th>Dropout Probability</th>
                     <th>Actions</th>
                 </tr>
@@ -35,6 +36,7 @@
                     <td>{{ s.name }}</td>
                     <td>{{ s.gpa }}</td>
                     <td>{{ s.attendance }}%</td>
+                    <td><span class="badge-risk badge-medium">At Risk</span></td>
                     <td>{{ "%.2f"|format(s.risk_score or 0) }}</td>
                     <td>
                         <a href="{{ url_for('edit_student', student_id=s.id) }}" class="icon-action"><i class="ph ph-eye"></i></a>
@@ -42,7 +44,7 @@
                 </tr>
                 {% else %}
                 <tr>
-                    <td colspan="6" class="empty-row">No high-risk students at the moment.</td>
+                    <td colspan="7" class="empty-row">No at-risk students at the moment.</td>
                 </tr>
                 {% endfor %}
             </tbody>

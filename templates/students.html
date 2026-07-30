@@ -47,9 +47,9 @@
                     <td>{{ s.attendance }}%</td>
                     <td>{{ s.assignments_completed }}</td>
                     <td>
-                        {% if s.risk_label == 'High' %}
+                        {% if s.risk_label in ['High', 'high'] %}
                             <span class="badge-risk badge-high">High Risk</span>
-                        {% elif s.risk_label == 'Medium' %}
+                        {% elif s.risk_label in ['Medium', 'At Risk', 'at risk', 'medium'] %}
                             <span class="badge-risk badge-medium">At Risk</span>
                         {% else %}
                             <span class="badge-risk badge-low">Low Risk</span>

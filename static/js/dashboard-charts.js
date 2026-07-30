@@ -1,6 +1,13 @@
 (function () {
     const data = window.dashboardData || {};
 
+    const chartColors = {
+        low: '#16a34a',
+        medium: '#d97706',
+        high: '#dc2626',
+        feature: '#4f46e5'
+    };
+
     const donutCtx = document.getElementById('riskDonutChart');
     if (donutCtx) {
         new Chart(donutCtx, {
@@ -9,7 +16,7 @@
                 labels: ['Low Risk', 'At Risk', 'High Risk'],
                 datasets: [{
                     data: [data.lowRisk || 0, data.mediumRisk || 0, data.highRisk || 0],
-                    backgroundColor: ['#22c55e', '#f59e0b', '#ef4444'],
+                    backgroundColor: [chartColors.low, chartColors.medium, chartColors.high],
                     borderWidth: 0,
                     hoverOffset: 6
                 }]
@@ -32,24 +39,24 @@
                     {
                         label: 'Low Risk',
                         data: data.trendLow || [],
-                        borderColor: '#22c55e',
-                        backgroundColor: '#22c55e',
+                        borderColor: chartColors.low,
+                        backgroundColor: chartColors.low,
                         tension: 0.4,
                         pointRadius: 4
                     },
                     {
                         label: 'At Risk',
                         data: data.trendMedium || [],
-                        borderColor: '#f59e0b',
-                        backgroundColor: '#f59e0b',
+                        borderColor: chartColors.medium,
+                        backgroundColor: chartColors.medium,
                         tension: 0.4,
                         pointRadius: 4
                     },
                     {
                         label: 'High Risk',
                         data: data.trendHigh || [],
-                        borderColor: '#ef4444',
-                        backgroundColor: '#ef4444',
+                        borderColor: chartColors.high,
+                        backgroundColor: chartColors.high,
                         tension: 0.4,
                         pointRadius: 4
                     }
@@ -79,7 +86,7 @@
                 labels: ['Attendance %', 'GPA', 'Assignments', 'Sem. Performance', 'Family Income'],
                 datasets: [{
                     data: [0.32, 0.24, 0.18, 0.12, 0.06],
-                    backgroundColor: '#6366f1',
+                    backgroundColor: chartColors.feature,
                     borderRadius: 6,
                     barThickness: 16
                 }]
